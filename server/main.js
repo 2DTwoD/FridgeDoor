@@ -1,4 +1,3 @@
-const Message = require("./models/Message");
 const Action = require("./models/ActionEnum");
 const express = require("express");
 const http = require("http");
@@ -28,17 +27,17 @@ webSocketServer.on('connection', async ws => {
         const iMessage = JSON.parse(m.toString());
         switch (iMessage.action) {
             case Action.update:
-                wsUpdate(iMessage);
+                await wsUpdate(iMessage);
                 break;
             case Action.create:
-                wsCreate(iMessage);
+                await wsCreate(iMessage);
                 break;
             case Action.drop:
-                wsDelete(iMessage);
+                await wsDelete(iMessage);
                 break;
             default:
                 console.log("WebSocket unknown action!");
-                break;
+                return;
         }
         webSocketServer.clients.forEach(
             client => {
@@ -102,12 +101,7 @@ app.use((request, response, next) => {
         next();
     }
 });
-app.get("/note_crud", async (request, response) =>{
+app.get("/", async (request, response) =>{
     const notes = await Note.find({});
     response.send({notes: notes});
 });
-// app.delete("/note_crud/:id", jsonParser, async (request, response) =>{
-//     if(!request.body) return request.sendStatus(400);
-//     const note = await Note.deleteOne({id: request.params.id});
-//     response.send({deleted: note});
-// });

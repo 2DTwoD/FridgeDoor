@@ -42,6 +42,7 @@ export class MoveDirective implements AfterViewInit{
 
   @HostListener("window:mouseup")
   onMouseUp() {
+    this.noteComponentRef.placeNoteOnWindow();
     if(!this.mouseDown) return;
     this.noteComponentRef.busy = false;
     this.mouseDown = false;

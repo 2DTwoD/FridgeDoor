@@ -1,7 +1,6 @@
 const Action = {
-    getAll: 0,
-    update: 1,
-    create: 2,
-    drop: 3
+    update: 0,
+    create: 1,
+    drop: 2
 }
 module.exports = Action;

@@ -1,4 +1,5 @@
 import {
+  AfterContentInit,
   AfterViewInit,
   Component,
   Renderer2,
@@ -10,7 +11,7 @@ import {AppComponent} from "../../../app.component";
 import {NoteService} from "../../../services/note/note.service";
 import {CoordinateCut} from "../../../utils/CoordinateCut";
 import {NoteWebsocketService} from "../../../services/note_websocket/note-websocket.service";
-import {AddAction, DeleteAction} from "../../../utils/AddAction";
+import {AddAction, DeleteAction, UpdateAction} from "../../../utils/AddDeleteAction";
 
 @Component({
   selector: 'app-note',
@@ -34,15 +35,25 @@ export class NoteComponent implements AfterViewInit{
 
   constructor(private parentComponent: AppComponent,
               private noteService: NoteWebsocketService,
-              private renderer: Renderer2) {
+              private renderer: Renderer2,
+              private updateAction: UpdateAction) {
   }
 
   ngAfterViewInit(): void {
     this.noteElement = this.noteBodyRef.element.nativeElement;
     this.textAreaElement = <HTMLTextAreaElement>this.textAreaRef.element.nativeElement;
+    setTimeout(() => this.placeNoteOnWindow(), 0);
+    this.updateAction.subscribe(id => {
+      if(id !== this.id){
+        return;
+      }
+      this.textAreaAutoSize();
+    });
     this.textAreaAutoSize();
+  }
+  public placeNoteOnWindow(): void{
     this.point = {x: CoordinateCut.cut(this.noteElement.offsetWidth, 0, window.innerWidth, this.point.x),
-                  y: CoordinateCut.cut(this.noteElement.offsetHeight, 0, window.innerHeight, this.point.y)};
+                  y: CoordinateCut.cut(this.noteElement.offsetHeight, 0, window.innerHeight, this.point.y)}
   }
   public clearNote(): void{
     this.text = "";
@@ -83,7 +94,6 @@ export class NoteComponent implements AfterViewInit{
   isBlack(): boolean{
     return this.getAdditionalColor() === NoteComponent.black;
   }
-
   toggleDelConVis(): void{
     this.delConVis = !this.delConVis;
     this.busy = this.delConVis;
@@ -110,6 +120,7 @@ export class NoteComponent implements AfterViewInit{
   }
   set text(value: string){
     this._noteParameters.text = value;
+    this.textAreaAutoSize();
     this.noteService.updateNote(this._noteParameters);
   }
   get done(): boolean{

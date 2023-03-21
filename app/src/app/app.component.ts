@@ -14,7 +14,7 @@ import {NoteService} from "./services/note/note.service";
 import {logCumulativeDurations} from "@angular-devkit/build-angular/src/builders/browser-esbuild/profiling";
 import {NoteWebsocketService} from "./services/note_websocket/note-websocket.service";
 import {map} from "rxjs";
-import {AddAction, DeleteAction} from "./utils/AddAction";
+import {AddAction, DeleteAction} from "./utils/AddDeleteAction";
 
 @Component({
   selector: 'app-root',
@@ -39,7 +39,7 @@ export class AppComponent implements AfterViewInit{
   ngAfterViewInit(): void {
     this.noteService.getNotes().subscribe((data: any) => {
       for(let noteParameters of data["notes"]){
-        this.noteService.allData.push(noteParameters);
+        this.noteService.allDataPush(noteParameters);
         this.newNote(noteParameters);
       }
     });
@@ -59,7 +59,7 @@ export class AppComponent implements AfterViewInit{
 
   public addNote(): void{
     this.id_count = 0;
-    const ids = this.noteService.allData.map(val => val.id);//this.components.map(val => val.instance.id);
+    const ids = this.noteService.allData.map(val => val.id);
     while(ids.length !== 0){
       if(ids.indexOf(this.id_count) == -1) break;
       this.id_count++;

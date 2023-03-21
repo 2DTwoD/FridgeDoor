@@ -13,3 +13,9 @@ export class AddAction extends Subject<NoteParameters>{
 })
 export class DeleteAction extends Subject<number>{
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UpdateAction extends Subject<number>{
+}
