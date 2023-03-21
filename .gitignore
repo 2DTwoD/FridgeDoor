@@ -1,0 +1,6 @@
+/app/node_modules
+/app/.vscode
+/app/.idea
+/app/.angular
+/server/.idea
+/server/node_modules

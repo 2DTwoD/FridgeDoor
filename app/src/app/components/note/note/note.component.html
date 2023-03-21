@@ -1,0 +1,64 @@
+<div id="note" #noteBody
+     [style.background-color]="color"
+     [style.left]="point.x + 'px'"
+     [style.top]="point.y + 'px'">
+  <div class="confirmContainer" *ngIf="delConVis">
+    <div class="confirmDialog">
+      Удалить?
+    </div>
+    <button class="confirmDialog"
+            (click)="deleteNote()">
+      Да
+    </button>
+    <button class="confirmDialog"
+            (click)="toggleDelConVis()">
+      Отмена
+    </button>
+  </div>
+  <div *ngIf="clrConVis" class="confirmContainer">
+    <div class="confirmDialog">Очистить?</div>
+    <button class="confirmDialog"
+            (click)="clearNote()">
+      Да
+    </button>
+    <button class="confirmDialog"
+            (click)="toggleClrConVis()">
+      Отмена
+    </button>
+  </div>
+  <div>
+    <input class="controlArea" type="checkbox"
+           (click)="toggleDone($event)"
+           [checked]="done"
+           [style.accent-color]="color">
+    <input class="controlArea" type="color"
+           (change)="changeColor($event)"
+           [value]="color">
+    <button id="moveArea" move
+            [style.color]="getAdditionalColor()">
+      <=>{{busy}}
+    </button>
+    <button class="controlArea"
+            [style.color]="getAdditionalColor()"
+            (click)="toggleClrConVis()">
+      -
+    </button>
+    <button class="controlArea"
+            [style.color]="getAdditionalColor()"
+            (click)="toggleDelConVis()">
+      X
+    </button>
+  </div>
+  <div>
+    <textarea placeholder="Записка" rows="1" #textArea
+              (keydown)="textAreaAutoSize()"
+              (focusout)="textFocusOut($event)"
+              (focusin)="textFocusIn()"
+              [style.color]="getAdditionalColor()"
+              [class.black]="isBlack()"
+              [class.white]="!isBlack()"
+              [style.text-decoration]="getTextDecoration()"
+              [value]="text">
+    </textarea>
+  </div>
+</div>
