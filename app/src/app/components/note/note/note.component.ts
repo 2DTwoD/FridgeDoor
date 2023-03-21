@@ -21,6 +21,7 @@ import {AddAction, DeleteAction, UpdateAction} from "../../../utils/AddDeleteAct
 })
 export class NoteComponent implements AfterViewInit{
   private _noteParameters: NoteParameters = new NoteParameters(0, {x: 0, y: 0}, "", false, "#000000", false);
+  private internalAction: boolean = false;
   noteElement!: HTMLElement;
   textAreaElement!: HTMLTextAreaElement | null;
   delConVis: boolean = false;
@@ -69,6 +70,10 @@ export class NoteComponent implements AfterViewInit{
   }
   textFocusIn(): void{
     this.busy = true;
+    setTimeout(() => {
+      this.textAreaElement?.blur();
+      this.busy = false;
+    }, 5000);
   }
   toggleDone(e: MouseEvent): void{
     this.done = (<HTMLInputElement>e.target).checked;
@@ -138,9 +143,10 @@ export class NoteComponent implements AfterViewInit{
     this.noteService.updateNote(this._noteParameters);
   }
   get busy(): boolean{
-    return this._noteParameters.busy;
+    return !this.internalAction && this._noteParameters.busy;
   }
   set busy(value: boolean){
+    this.internalAction = value;
     this._noteParameters.busy = value;
     this.noteService.updateNote(this._noteParameters);
   }

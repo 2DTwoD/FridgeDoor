@@ -2,6 +2,9 @@
      [style.background-color]="color"
      [style.left]="point.x + 'px'"
      [style.top]="point.y + 'px'">
+  <div class="confirmContainer" *ngIf="busy">
+    <div class="confirmDialog">Занят</div>
+  </div>
   <div class="confirmContainer" *ngIf="delConVis">
     <div class="confirmDialog">
       Удалить?
@@ -36,7 +39,7 @@
            [value]="color">
     <button id="moveArea" move
             [style.color]="getAdditionalColor()">
-      <=>{{busy}}
+      <=>
     </button>
     <button class="controlArea"
             [style.color]="getAdditionalColor()"
