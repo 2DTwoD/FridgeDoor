@@ -75,6 +75,7 @@ export class AppComponent implements AfterViewInit{
   public deleteNote(id:number): void{
     let componentRef: ComponentRef<NoteComponent> = this.components.filter(cf => cf.instance.id === id)[0];
     let indexOfViewRef: number = this.noteContainer.indexOf(componentRef.hostView);
+    componentRef.instance.clearBlurTimer();
     this.noteContainer.detach(indexOfViewRef);
     componentRef.destroy();
     this.components = this.components.filter(cf => cf.instance.id !== id);

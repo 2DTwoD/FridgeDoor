@@ -22,6 +22,8 @@ import {AddAction, DeleteAction, UpdateAction} from "../../../utils/AddDeleteAct
 export class NoteComponent implements AfterViewInit{
   private _noteParameters: NoteParameters = new NoteParameters(0, {x: 0, y: 0}, "", false, "#000000", false);
   private internalAction: boolean = false;
+  private autoBlur: boolean = false;
+  private blurTimer: number | undefined;
   noteElement!: HTMLElement;
   textAreaElement!: HTMLTextAreaElement | null;
   delConVis: boolean = false;
@@ -70,18 +72,29 @@ export class NoteComponent implements AfterViewInit{
   }
   textFocusIn(): void{
     this.busy = true;
-    setTimeout(() => {
+    this.autoBlur = false;
+    this.clearBlurTimer();
+    this.blurTimer = setInterval(() => {
+      console.log("blurTimerEvent")
+      if(!this.autoBlur){
+        this.autoBlur = true;
+        return;
+      }
       this.textAreaElement?.blur();
       this.busy = false;
+      this.clearBlurTimer();
     }, 5000);
   }
-  toggleDone(e: MouseEvent): void{
-    this.done = (<HTMLInputElement>e.target).checked;
+  public clearBlurTimer(){
+    if(this.blurTimer){
+      clearInterval(this.blurTimer);
+    }
   }
   getTextDecoration(): string{
     return this.done? "line-through": "none";
   }
   textAreaAutoSize(): void{
+    this.autoBlur = false;
     setTimeout(() => {
       this.renderer.setStyle(this.textAreaElement, "height", "auto");
       this.renderer.setStyle(this.textAreaElement, "height", this.textAreaElement?.scrollHeight + "px");
@@ -99,13 +112,32 @@ export class NoteComponent implements AfterViewInit{
   isBlack(): boolean{
     return this.getAdditionalColor() === NoteComponent.black;
   }
+  toggleDone(e: MouseEvent): void{
+    this.done = (<HTMLInputElement>e.target).checked;
+  }
   toggleDelConVis(): void{
     this.delConVis = !this.delConVis;
     this.busy = this.delConVis;
+    this.clearBlurTimer();
+    if(this.delConVis) {
+      this.blurTimer = setTimeout(() => {
+        if (this.delConVis) {
+          this.toggleDelConVis();
+        }
+      }, 5000);
+    }
   }
   toggleClrConVis(): void{
     this.clrConVis = !this.clrConVis;
     this.busy = this.clrConVis;
+    this.clearBlurTimer();
+    if(this.clrConVis) {
+      this.blurTimer = setTimeout(() => {
+        if (this.clrConVis) {
+          this.toggleClrConVis();
+        }
+      }, 5000);
+    }
   }
   //get/set
   get id(): number{
