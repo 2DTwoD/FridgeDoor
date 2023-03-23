@@ -5,6 +5,9 @@
   <title>{{title}}</title>
 </head>
 <body>
+<div class="confirmContainer" *ngIf="!noteService.connected">
+  <div class="confirmDialog">Нет связи с сервером</div>
+</div>
 <ng-container #noteContainer id="screen">
   <button (click)="addNote()">+</button>
 </ng-container>

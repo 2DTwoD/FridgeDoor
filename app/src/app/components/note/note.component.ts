@@ -1,17 +1,17 @@
 import {
   AfterContentInit,
   AfterViewInit,
-  Component,
+  Component, HostListener, OnDestroy,
   Renderer2,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import {NoteParameters} from "../../../models/NoteParameters";
-import {AppComponent} from "../../../app.component";
-import {NoteService} from "../../../services/note/note.service";
-import {CoordinateCut} from "../../../utils/CoordinateCut";
-import {NoteWebsocketService} from "../../../services/note_websocket/note-websocket.service";
-import {AddAction, DeleteAction, UpdateAction} from "../../../utils/AddDeleteAction";
+import {NoteParameters} from "../../models/NoteParameters";
+import {AppComponent} from "../../app.component";
+import {NoteService} from "../../services/note/note.service";
+import {CoordinateCut} from "../../utils/CoordinateCut";
+import {NoteWebsocketService} from "../../services/note_websocket/note-websocket.service";
+import {AddAction, DeleteAction, UpdateAction} from "../../utils/ADUAction";
 
 @Component({
   selector: 'app-note',
@@ -139,6 +139,12 @@ export class NoteComponent implements AfterViewInit{
       }, 5000);
     }
   }
+  @HostListener('window:unload')
+  unloadHandler() {
+    if(this.internalAction){
+      this.busy = false;
+    }
+  }
   //get/set
   get id(): number{
     return this._noteParameters.id;
@@ -188,4 +194,5 @@ export class NoteComponent implements AfterViewInit{
   set noteParameters(value: NoteParameters){
     this._noteParameters = value;
   }
+
 }

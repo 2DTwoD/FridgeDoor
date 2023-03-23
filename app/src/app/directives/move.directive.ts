@@ -7,7 +7,7 @@ import {
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import {NoteComponent} from "../components/note/note/note.component";
+import {NoteComponent} from "../components/note/note.component";
 import {NoteService} from "../services/note/note.service";
 import {CoordinateCut} from "../utils/CoordinateCut";
 import {NoteWebsocketService} from "../services/note_websocket/note-websocket.service";

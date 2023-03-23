@@ -2,19 +2,19 @@ import {
   AfterContentInit, AfterViewInit,
   Component,
   ComponentRef,
-  ElementRef,
+  ElementRef, OnDestroy,
   OnInit,
   ViewChild,
   ViewContainerRef,
   ViewRef
 } from '@angular/core';
-import {NoteComponent} from "./components/note/note/note.component";
+import {NoteComponent} from "./components/note/note.component";
 import {NoteParameters} from "./models/NoteParameters";
 import {NoteService} from "./services/note/note.service";
 import {logCumulativeDurations} from "@angular-devkit/build-angular/src/builders/browser-esbuild/profiling";
 import {NoteWebsocketService} from "./services/note_websocket/note-websocket.service";
 import {map} from "rxjs";
-import {AddAction, DeleteAction} from "./utils/AddDeleteAction";
+import {AddAction, DeleteAction} from "./utils/ADUAction";
 
 @Component({
   selector: 'app-root',
@@ -22,7 +22,7 @@ import {AddAction, DeleteAction} from "./utils/AddDeleteAction";
   styleUrls: ['./app.component.css'],
   providers: [NoteService]
 })
-export class AppComponent implements AfterViewInit{
+export class AppComponent implements AfterViewInit, OnDestroy{
 
   title: string = 'Дверца холодильника';
 
@@ -32,7 +32,7 @@ export class AppComponent implements AfterViewInit{
   components: Array<ComponentRef<NoteComponent>> = [];
   id_count!: number;
 
-  constructor(private noteService: NoteWebsocketService,
+  constructor(public noteService: NoteWebsocketService,
               private addAction: AddAction,
               private deleteAction: DeleteAction) { }
 
@@ -86,5 +86,9 @@ export class AppComponent implements AfterViewInit{
       return res.length == 2? res: "0" + res;
     }
     return "#" + rndHEXStr() + rndHEXStr() + rndHEXStr();
+  }
+  ngOnDestroy(): void {
+    console.log("Destroy service");
+    this.noteService.unsubscribe();
   }
 }

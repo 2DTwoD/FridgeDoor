@@ -3,13 +3,13 @@ import {retry, Subject} from "rxjs";
 import {webSocket} from "rxjs/webSocket";
 import {NoteParameters} from "../../models/NoteParameters";
 import {HttpClient} from "@angular/common/http";
-import {AddAction, DeleteAction, UpdateAction} from "../../utils/AddDeleteAction";
-import {NoteComponent} from "../../components/note/note/note.component";
+import {AddAction, DeleteAction, UpdateAction} from "../../utils/ADUAction";
+import {NoteComponent} from "../../components/note/note.component";
 
 @Injectable({
   providedIn: 'root'
 })
-export class NoteWebsocketService implements OnDestroy{
+export class NoteWebsocketService {
   readonly ip = "127.0.0.1";
   readonly wsPort = "3001";
   readonly httpPort = "3002";
@@ -17,6 +17,7 @@ export class NoteWebsocketService implements OnDestroy{
   readonly httpURL = `http://${this.ip}:${this.httpPort}/`;
   private ioLine!: Subject<Message>;
   private _allData: Array<NoteParameters> = [];
+  private _connected: boolean = false;
 
   constructor(private http: HttpClient,
               private deleteAction: DeleteAction,
@@ -38,21 +39,26 @@ export class NoteWebsocketService implements OnDestroy{
   }
 
   private getNewWebSocket(): Subject<Message> {
-    return webSocket({
-      url: this.webSocketURL,
-      closeObserver: {
+    return webSocket({url: this.webSocketURL,
+      openObserver:{
         next: () => {
-          console.log('WebSocket connection closed');
-          this.ioLine.unsubscribe();
+          this._connected = true;
         }
       },
+      closeObserver: {
+        next: () => {
+          this.unsubscribe();
+          this.connect();
+        }
+      }
     });
   }
   public connect(){
     console.log("Websocket connection start");
     this.ioLine = this.getNewWebSocket();
-    this.ioLine.pipe(retry({delay: 1000})).subscribe({
+    this.ioLine.subscribe({
       next: (data: any) => {
+        this._connected = true;
         let dataNoteParameters: NoteParameters = data.noteParameters;
         switch(data.action){
           case Action.update:
@@ -75,7 +81,7 @@ export class NoteWebsocketService implements OnDestroy{
         }
       },
       error: (error: ErrorEvent) => {
-        console.log("Websocket error come: " + error.message)
+        console.log("Websocket error come: " + error.message);
       },
       complete: () => {
         console.log("Websocket connection complete");
@@ -90,15 +96,18 @@ export class NoteWebsocketService implements OnDestroy{
     note1.color = note2.color;
     note1.busy = note2.busy;
   }
+  public unsubscribe(): void{
+    this._connected = false;
+    this.ioLine.unsubscribe();
+  }
   public allDataPush(noteComponent: NoteComponent): void{
     this._allData.push(noteComponent);
   }
   get allData(): Array<NoteParameters>{
     return Object.assign([], this._allData);
   }
-  ngOnDestroy(): void {
-    console.log("Destroy service");
-    this.ioLine.unsubscribe();
+  public get connected(): boolean{
+    return this._connected;
   }
 }
 
